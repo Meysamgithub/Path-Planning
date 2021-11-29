@@ -5,6 +5,7 @@ namespace path_planning {
 
     namespace utils {
 
+
         ClipperLib::Paths import_paths_from_csv(const std::string& file_path){
             std::vector<std::vector<int>> content;
 	        std::vector<int> row;
@@ -27,7 +28,7 @@ namespace path_planning {
                         // multiplied by 1000 because we only care about 3 digit accuracy for now.
                         // also Clipper only works with integer numbers that's why we multiply our double numbers by 1000
                         // and then convert them to int. 
-                        double double_word = std::stod(word) * 1000.0;  
+                        double double_word = std::stod(word) * PRECISION;  
                         row.push_back(int(double_word));
                     } 
                     // the third element of the row should not be multiplied by 1000 as it is the id of the field or obstacle
@@ -74,10 +75,10 @@ namespace path_planning {
                 for(int j = 0; j < paths[i].size(); j++){
                     // check if we're adding the last line of the csv and avoid adding an empty line in the end of the file
                     if ( i == paths.size()-1 && j == paths[i].size()-1 ){
-                        output_file << paths[i][j].X / 1000.0 << "," << paths[i][j].Y / 1000.0 << "," << i;
+                        output_file << intpoint_to_double(paths[i][j].X) << "," << intpoint_to_double(paths[i][j].Y) << "," << i;
                     }
                     else{
-                        output_file << paths[i][j].X / 1000.0 << "," << paths[i][j].Y / 1000.0 << "," << i << "\n";
+                        output_file << intpoint_to_double(paths[i][j].X) << "," << intpoint_to_double(paths[i][j].Y) << "," << i << "\n";
                     }
                 }
             }
@@ -91,18 +92,32 @@ namespace path_planning {
                 std::cout << "________________\n" << "Path " << i << "\n";
                 // loop over all points in a path and print them 
                 for(int j = 0; j < paths[i].size(); j++){
-                    std::cout << paths[i][j].X / 1000.0 << ", " << paths[i][j].Y / 1000.0 << "\n";
+                    std::cout << intpoint_to_double(paths[i][j].X) << ", " << intpoint_to_double(paths[i][j].Y) << "\n";
                 }
             }
         }
 
         double distance_between_two_points(ClipperLib::IntPoint current_point, ClipperLib::IntPoint next_point){
-            return std::hypot(( current_point.X- next_point.X), (current_point.Y - next_point.Y))/1000;
+            double distance = std::hypot(
+                intpoint_to_double(current_point.X- next_point.X), 
+                intpoint_to_double(current_point.Y - next_point.Y)
+            ); 
+            return distance;
         }
 
-        ClipperLib::IntPoint find_next_sanitized_point(double step_length, ClipperLib::IntPoint current_point, ClipperLib::IntPoint previous_reference_point, ClipperLib::IntPoint next_reference_point){
-           ClipperLib::IntPoint sanitized_point(0,0);
-            if (std::abs(previous_reference_point.X - next_reference_point.X) < distance_threshold) {
+        ClipperLib::IntPoint find_next_sanitized_point(
+            double step_length, 
+            ClipperLib::IntPoint current_point, 
+            ClipperLib::IntPoint previous_reference_point, 
+            ClipperLib::IntPoint next_reference_point
+        ){
+           ClipperLib::DoublePoint sanitized_point(0,0);
+           // converting input point types to double
+           ClipperLib::DoublePoint current_point_double = ClipperLib::DoublePoint(current_point);
+           ClipperLib::DoublePoint previous_reference_point_double = ClipperLib::DoublePoint(previous_reference_point);
+           ClipperLib::DoublePoint next_reference_point_double = ClipperLib::DoublePoint(next_reference_point);
+
+            if (std::abs(previous_reference_point_double.X - next_reference_point_double.X) < distance_threshold) {
             // special case, when the line that connects the previous and next reference point is vertical
             sanitized_point.X = next_reference_point.X;
             double yub = fmax(current_point.Y, next_reference_point.Y);

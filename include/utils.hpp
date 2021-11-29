@@ -27,8 +27,12 @@ namespace path_planning {
 
         ClipperLib::IntPoint find_next_sanitized_point(double, ClipperLib::IntPoint, ClipperLib::IntPoint, ClipperLib::IntPoint);
 
+        double intpoint_to_double(int);
+
         constexpr double distance_threshold = 0.0001;  //!< To compare the distance between two points we need to define a
                                                //!< threshold to consider the points different or the same (unit: meter)
+
+        constexpr double PRECISION = 1000.0;
 
     } // namespace utils
 

@@ -20,6 +20,7 @@ int main() {
     // ClipperLib::IntPoint first_point(0,0);
     // ClipperLib::IntPoint second_point(1,1);
 
+    // The following are examples to check if the functions (distance_between_two_points and find_next_sanitized_point) work properly.
     ClipperLib::IntPoint first_point = imported_paths[0][0];
     ClipperLib::IntPoint second_point = imported_paths[0][2];
 
@@ -27,6 +28,7 @@ int main() {
     d = path_planning::utils::distance_between_two_points(first_point, second_point);
 
     std::cout << "The distance between x and y is " << d << std::endl;
+
     double step_length = 2;
     ClipperLib::IntPoint current_point(1,0);
     ClipperLib::IntPoint previous_reference_point(0,0);
@@ -36,6 +38,10 @@ int main() {
     std::cout << next_sanitized_point_1.X << std::endl;
     
     path_planning::utils::export_paths_to_csv("field_headland_1", solution);
+
+    // ClipperLib::DoublePoint current_point_double = (ClipperLib::DoublePoint)(current_point); 
+    ClipperLib::IntPoint(current_point_double);
+    // std::cout << "Double current point: " << current_point_double.X << ", " << current_point_double.Y << typeid(current_point_double.X).name() << "\n"; 
 
     return 0; 
 
